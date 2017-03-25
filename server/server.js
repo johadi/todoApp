@@ -43,6 +43,20 @@ app.get('/todos/:id',(req,res)=>{
             return res.status(200).send({todo});
         })
         .catch(err=>res.send(400).send(err));
+});
+app.delete('/todos/:id',(req,res)=>{
+    var id=req.params.id;
+    if(!ObjectID.isValid(id)){
+        return res.status(404).send();
+    }
+    Todo.findByIdAndRemove(id)
+        .then((todo)=>{
+            if(!todo){
+                return res.status(404).send();
+            }
+            return res.status(200).send({todo});
+        })
+        .catch(err=>res.status(400).send());
 })
 app.listen(port,(err)=>{
     if(err) return console.error(err);
