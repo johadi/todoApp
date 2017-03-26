@@ -8,6 +8,7 @@ const _=require('lodash');
 var {mongoose}=require('./db/mongoose');
 var {User}=require('./models/user');
 var {Todo}=require('./models/todo');
+var {authenticate}=require('./middlewares/authenticate');
 var port=process.env.PORT;
 
 var app=express();
@@ -95,7 +96,19 @@ app.post('/users',(req,res)=>{
             res.header('x-auth',token).send(user);
         })
         .catch(err=>res.status(400).send(err));
-})
+});
+app.get('/users/me',authenticate,(req,res)=>{
+   if(req.user){
+       return res.status(200).send(req.user);
+   }
+    return res.status(404).send();
+});
+app.get('/users/token',authenticate,(req,res)=>{
+    if(req.token){
+        return res.status(200).send(req.token);
+    }
+    return res.status(404).send();
+});
 app.listen(port,(err)=>{
     if(err) return console.error(err);
     console.log('Server running on port '+port);
