@@ -4,8 +4,8 @@
 const mongoose=require('mongoose');
 
 mongoose.Promise=global.Promise
-mongoose.connect('mongodb://127.0.0.1:27017/TodoApp',(err)=>{
+mongoose.connect(process.env.MONGODB_URI,(err)=>{
     if(err) return console.error(err);
-    console.log('database connected successfully');
+    console.log('database connected' ,process.env.MONGODB_URI);
 });
 module.exports={mongoose};
