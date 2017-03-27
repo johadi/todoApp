@@ -109,6 +109,16 @@ app.get('/users/token',authenticate,(req,res)=>{
     }
     return res.status(404).send();
 });
+
+app.post('/users/login',(req,res)=>{
+    var body=_.pick(req.body,['email','password']);
+
+    User.findByCredentials(body.email, body.password)
+        .then(user=>{
+            res.send(user)
+        })
+        .catch(err=>res.status(400).send(err));
+});
 app.listen(port,(err)=>{
     if(err) return console.error(err);
     console.log('Server running on port '+port);
