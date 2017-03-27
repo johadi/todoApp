@@ -58,17 +58,13 @@ UserSchema.statics.findByCredentials=function(email,password){
     var User=this;
     return User.findOne({email}).then((user)=>{
         if(!user){
-            console.log("error");
             return Promise.reject();
         }
-
         return new Promise((resolve,reject)=>{
             bcrypt.compare(password,user.password,(err,res)=>{
                 if(res){
-                    console.log("hash");
                     resolve(user);
                 }else{
-                    console.log(typeof user.password);
                     reject();
                 }
             });
@@ -76,17 +72,16 @@ UserSchema.statics.findByCredentials=function(email,password){
     });
 };
 UserSchema.pre('save',function(next){
-   var user=this;
-    if(user.isModified()){
-        bcrypt.genSalt(10,(err,salt)=>{
-            bcrypt.hash(user.password,salt,null,(err,hash)=>{
-                user.password=hash;
-                next();
-            });
-        })
-    }else{
-        next();
-    }
+    var user=this;
+    if(!user.isModified("password")) return next();//go to next operation if password is not given a value
+    bcrypt.genSalt(10,function(err,salt){
+        if(err) return next(err);
+        bcrypt.hash(user.password,salt,null,function(err,hash){ //hash the password and return it as hash in the function parameter
+            if(err) return next(err);
+            user.password=hash; //assigning the hash value to password again which is now ready to be saved into the database
+            next();
+        });
+    });
 });
 var User=mongoose.model('User',UserSchema);
 module.exports={User}
