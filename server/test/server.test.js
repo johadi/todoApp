@@ -65,22 +65,27 @@ describe('GET /todos/:id',()=>{
     it('should return a todos with id',(done)=>{
         request(app)
             .get(`/todos/${todos[0]._id.toHexString()}`)
+            .set('x-auth',users[0].tokens[0].token)
             .expect(200)
             .expect((res)=>{
                 expect(res.body.todo.text).toBe(todos[0].text);
             })
             .end(done)
     });
-    it('it should return 404 if valid ID not found',(done)=>{
-        var hexID=new ObjectID().toHexString();
+    it('it should not return a todo created by other users',(done)=>{
+        var hexID=todos[1]._id.toHexString();
         request(app)
-        .get(`/todos/${hexID}`)
-        .expect(404)
-        .end(done)
+            .get(`/todos/${hexID}`)
+            .set('x-auth',users[0].tokens[0].token)
+            .expect(404)
+            .end(done)
     });
     it('it should return 404 if ID not ObjectId',(done)=>{
+        var hexId=new ObjectID().toHexString();
+
         request(app)
-            .get(`/todos/1234`)
+            .get(`/todos/${hexId}`)
+            .set('x-auth',users[0].tokens[0].token)
             .expect(404)
             .end(done)
     });
@@ -91,6 +96,7 @@ describe('/DELETE /todos/:id',()=>{
         var hexId1=todos[1]._id.toHexString();
         request(app)
             .delete(`/todos/${hexId1}`)
+            .set('x-auth',users[1].tokens[0].token)
             .expect(200)
             .expect((res)=>{
                 expect(res.body.todo._id).toBe(hexId1)
@@ -104,26 +110,44 @@ describe('/DELETE /todos/:id',()=>{
                     }).catch(err=>done(err));
             });
     });
-    it('should return 404 if valid ID is not found',(done)=>{
+    it('should not remove todo of other users',(done)=>{
+        var hexId1=todos[0]._id.toHexString();
+        request(app)
+            .delete(`/todos/${hexId1}`)
+            .set('x-auth',users[1].tokens[0].token)
+            .expect(404)
+            .end((err,res)=>{
+                if(err) return done(err);
+                Todo.findById(hexId1)
+                    .then(todo=>{
+                        expect(todo).toExist();
+                        done();
+                    }).catch(err=>done(err));
+            });
+    });
+    it('should return 404 if todo is not found',(done)=>{
         var hexID=new ObjectID().toHexString();
         request(app)
             .delete(`/todos/${hexID}`)
+            .set('x-auth',users[1].tokens[0].token)
             .expect(404)
             .end(done)
     });
     it('should return 404 if ID is not ObjectId',(done)=>{
         request(app)
             .delete('/todos/23456')
+            .set('x-auth',users[1].tokens[0].token)
             .expect(404)
             .end(done)
     });
 });
 describe('PATCH todos/:id',()=>{
-   it('should update todo by id',(done)=>{
+    it('should update todo by id',(done)=>{
        var hexId=todos[0]._id.toHexString();
        var text='new patch update';
        request(app)
            .patch(`/todos/${hexId}`)
+           .set('x-auth',users[0].tokens[0].token)
            .send({text,completed: true})
            .expect(200)
            .expect((res)=>{
@@ -132,12 +156,23 @@ describe('PATCH todos/:id',()=>{
                expect(res.body.todo.completedAt).toBeA('number');
            })
            .end(done)
-   });
+    });
+    it('should not update todo by other users',(done)=>{
+        var hexId=todos[0]._id.toHexString();
+        var text='new patch update';
+        request(app)
+            .patch(`/todos/${hexId}`)
+            .set('x-auth',users[1].tokens[0].token)
+            .send({text,completed: true})
+            .expect(404)
+            .end(done)
+    });
     it('should clear updatedAt when todo is not completed',(done)=>{
         var hexId=todos[1]._id.toHexString();
         var text='this is new patch update 2';
         request(app)
             .patch(`/todos/${hexId}`)
+            .set('x-auth',users[1].tokens[0].token)
             .send({text,completed: false})
             .expect(200)
             .expect((res)=>{
