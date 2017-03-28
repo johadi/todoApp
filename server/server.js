@@ -15,8 +15,6 @@ var app=express();
 app.use(bodyParser.json());
 
 app.post('/todos',authenticate,(req,res)=>{
-   console.log(req.body);
-    //return res.json(req.body);
     var todo=new Todo({
         text: req.body.text,
         _creator: req.user._id

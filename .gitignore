@@ -1,5 +1,6 @@
 # Created by .ignore support plugin (hsz.mobi)
 .idea/
+server/config/config.json
 node_modules/
 .xml
 

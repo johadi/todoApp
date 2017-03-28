@@ -1,14 +1,12 @@
-/**
- * Created by ILYASANATE on 25/03/2017.
- */
 var env=process.env.NODE_ENV || 'development';
 
-console.log('environment****',env);
+if(env==='development' || env==='test'){
+    var config=require('./config.json');
 
-if(env==='development'){
-    process.env.PORT=3000;
-    process.env.MONGODB_URI="mongodb://127.0.0.1:27017/TodoApp";
-}else if(env==='test'){
-    process.env.PORT=3000;
-    process.env.MONGODB_URI="mongodb://127.0.0.1:27017/TodoAppTest";
+    var config_enviroment_fields=config[env];
+    //console.log(Object.keys(config_enviroment_fields));
+
+    Object.keys(config_enviroment_fields).forEach((key)=>{
+        process.env[key]=config_enviroment_fields[key];
+    });
 }
