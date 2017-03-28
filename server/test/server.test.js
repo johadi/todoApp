@@ -14,10 +14,11 @@ beforeEach(populateUsers);
 beforeEach(populateTodos);
 
 describe('POST /todos',()=>{
-    it('should create a new ToDo',(done)=>{
+    it('should create a new Todo',(done)=>{
         var text='node is super';
         request(app)
             .post('/todos')
+            .set('x-auth',users[0].tokens[0].token)
             .send({text})
             .expect(200)
             .expect((res)=>{
@@ -35,6 +36,7 @@ describe('POST /todos',()=>{
     it('should not create todo with bad data',(done)=>{
         request(app)
             .post('/todos')
+            .set('x-auth',users[0].tokens[0].token)
             .send({})
             .expect(400)
             .end((err,res)=>{
@@ -51,9 +53,10 @@ describe('GET /todos',()=>{
    it('get all the data',(done)=>{
        request(app)
            .get('/todos')
+           .set('x-auth',users[0].tokens[0].token)
            .expect(200)
            .expect((res)=>{
-               expect(res.body.todos.length).toBe(2);
+               expect(res.body.todos.length).toBe(1);
            })
            .end(done);
    });

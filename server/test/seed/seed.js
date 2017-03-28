@@ -6,10 +6,9 @@ const {Todo}=require('./../../models/todo');
 const {User}=require('./../../models/user');
 const jwt=require('jsonwebtoken');
 
-const todos=[{_id: new ObjectID,text: "todo text one"},
-    {_id: new ObjectID,text: 'todo text two',completed: true,completedAt: 1234}];
 var userOneId=new ObjectID();
 var userTwoId=new ObjectID();
+
 const users=[{
     _id: userOneId,
     email: 'ovenje@gmail.com',
@@ -23,6 +22,9 @@ const users=[{
     email: 'jimoh@gmail.com',
     password: '112233'
 }];
+
+const todos=[{_id: new ObjectID,text: "todo text one",_creator: userOneId},
+    {_id: new ObjectID,text: 'todo text two',completed: true,completedAt: 1234,_creator: userTwoId}];
 const populateTodos=(done)=>{
     Todo.remove({})
         .then(()=>{
