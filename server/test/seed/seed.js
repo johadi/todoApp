@@ -20,7 +20,11 @@ const users=[{
 },{
     _id: userTwoId,
     email: 'jimoh@gmail.com',
-    password: '112233'
+    password: '112233',
+    tokens: [{
+        access: 'auth',
+        token: jwt.sign({_id: userTwoId,access: 'auth'},'abc123').toString()
+    }]
 }];
 
 const todos=[{_id: new ObjectID,text: "todo text one",_creator: userOneId},
@@ -30,7 +34,7 @@ const populateTodos=(done)=>{
         .then(()=>{
             return Todo.insertMany(todos);
         }).then(()=>done());
-}
+};
 const populateUsers=(done)=>{
     User.remove({})
         .then(()=>{
@@ -39,6 +43,6 @@ const populateUsers=(done)=>{
 
             return Promise.all([userOne,userTwo]);
         }).then(()=>done());
-}
+};
 
 module.exports={todos,populateTodos,users,populateUsers};
