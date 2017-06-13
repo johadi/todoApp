@@ -3,4 +3,5 @@
 server/config/config.json
 node_modules/
 .xml
+/playground
 
