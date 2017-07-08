@@ -25,6 +25,8 @@ UserSchema.methods.toJSON=function(){
     var userObject=user.toObject();
     return _.pick(userObject,['_id','email']);
 }
+
+//generate token and save it to db whenever User model instance calls this method. (mostly used by find method during login route and registration route)
 UserSchema.methods.generateAuthToken=function(){
     var user=this;
     var access='auth';
@@ -40,9 +42,10 @@ UserSchema.methods.generateAuthToken=function(){
 UserSchema.methods.removeToken=function(token){
     var user=this;
 
-    return user.update({$pull: {tokens: {token: token}}})
+    return user.update({$pull: {tokens: {token: token}}}) //removes token({token,access}) value from arrays of objects of tokens
 }
-UserSchema.statics.findByToken=function(token){
+
+UserSchema.statics.findByToken=function(token){//to be used by the authentication middleware anytime someone wants to access protected routes
     var User=this;
     var decoded;
     try{
@@ -59,6 +62,7 @@ UserSchema.statics.findByToken=function(token){
         'tokens.access': 'auth'
     });
 };
+//used in the login route with generateAuthToken() instance method
 UserSchema.statics.findByCredentials=function(email,password){
     var User=this;
     return User.findOne({email}).then((user)=>{

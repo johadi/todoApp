@@ -14,6 +14,7 @@ var port=process.env.PORT;
 var app=express();
 app.use(bodyParser.json());
 
+//---------------------Todo routes---------------------------------------------
 app.post('/todos',authenticate,(req,res)=>{
     var todo=new Todo({
         text: req.body.text,
@@ -86,7 +87,9 @@ app.patch('/todos/:id',authenticate,(req,res)=>{
         })
         .catch(err=>res.status(400).send());
 });
-app.post('/users',(req,res)=>{
+
+//---------------User routes-------------------------------
+app.post('/users',(req,res)=>{//new user registration route
     var body=_.pick(req.body,['email','password']);
 
     //var user=new User(body);
