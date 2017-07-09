@@ -17,7 +17,7 @@ var authenticate2=(req,res,next)=>{
   User.findByToken(token)
       .then((user)=>{
         if(!user) return Promise.reject('user not found');
-        req.user=user;
+        req.user2=user;
         req.token=token;
         next();
       })
